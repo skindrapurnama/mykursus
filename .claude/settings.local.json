@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo *)",
+      "Bash(gh api *)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p /c/Users/LenvPC/.claude/skills)",
+      "Bash(cp -r /tmp/uiuxpromax/ui-ux-pro-max-skill/.claude/skills/* /c/Users/LenvPC/.claude/skills/)",
+      "PowerShell(py *)"
+    ]
+  }
+}

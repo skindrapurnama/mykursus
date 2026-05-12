@@ -44,17 +44,90 @@
             <div class="lg:col-span-2 space-y-6">
 
                 {{-- Hero card --}}
+                @php
+                    $images = collect($course->images ?? [])->filter()->values();
+                @endphp
                 <article class="bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm overflow-hidden">
-                    <div class="relative aspect-[16/9] bg-(--color-surface-2) overflow-hidden">
-                        <div aria-hidden="true"
-                            class="absolute inset-0 bg-gradient-to-br from-(--color-brand-200) via-(--color-brand-100) to-(--color-accent-100)">
+                    @if ($images->isEmpty())
+                        {{-- Fallback: gradient + inisial judul --}}
+                        <div class="relative aspect-[16/9] bg-(--color-surface-2) overflow-hidden">
+                            <div aria-hidden="true"
+                                class="absolute inset-0 bg-gradient-to-br from-(--color-brand-200) via-(--color-brand-100) to-(--color-accent-100)">
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="font-display text-7xl text-(--color-brand-700)/40">
+                                    {{ strtoupper(mb_substr($course->title, 0, 1)) }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="font-display text-7xl text-(--color-brand-700)/40">
-                                {{ strtoupper(mb_substr($course->title, 0, 1)) }}
-                            </span>
+                    @elseif ($images->count() === 1)
+                        {{-- Satu gambar: tampilkan penuh --}}
+                        <div class="relative aspect-[16/9] bg-(--color-surface-2) overflow-hidden">
+                            <img src="{{ asset('storage/' . $images->first()) }}"
+                                alt="Gambar kursus {{ $course->title }}"
+                                class="absolute inset-0 w-full h-full object-cover" loading="lazy">
                         </div>
-                    </div>
+                    @else
+                        {{-- Banyak gambar: galeri dengan thumbnail --}}
+                        <div x-data="{ active: 0, total: {{ $images->count() }} }" class="relative">
+                            <div class="relative aspect-[16/9] bg-(--color-surface-2) overflow-hidden">
+                                @foreach ($images as $i => $img)
+                                    <img src="{{ asset('storage/' . $img) }}"
+                                        alt="Gambar kursus {{ $course->title }} ({{ $i + 1 }} dari {{ $images->count() }})"
+                                        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                                        x-bind:class="active === {{ $i }} ? 'opacity-100' : 'opacity-0'"
+                                        x-cloak
+                                        loading="{{ $i === 0 ? 'eager' : 'lazy' }}">
+                                @endforeach
+
+                                {{-- Counter --}}
+                                <span class="absolute top-3 right-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-black/60 text-white tabular-nums">
+                                    <span x-text="active + 1">1</span> / {{ $images->count() }}
+                                </span>
+
+                                {{-- Prev/Next --}}
+                                <button type="button"
+                                    @click="active = (active - 1 + total) % total"
+                                    aria-label="Gambar sebelumnya"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 inline-flex items-center justify-center rounded-full bg-white/90 text-(--color-text) shadow-md hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-brand-600) transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                        class="w-5 h-5" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button type="button"
+                                    @click="active = (active + 1) % total"
+                                    aria-label="Gambar berikutnya"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 inline-flex items-center justify-center rounded-full bg-white/90 text-(--color-text) shadow-md hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-brand-600) transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                        class="w-5 h-5" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {{-- Thumbnail strip --}}
+                            <div class="p-3 sm:p-4 bg-(--color-surface-2) border-t border-(--color-border)">
+                                <div class="flex gap-2 overflow-x-auto" role="list">
+                                    @foreach ($images as $i => $img)
+                                        <button type="button"
+                                            @click="active = {{ $i }}"
+                                            aria-label="Lihat gambar {{ $i + 1 }}"
+                                            class="relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-brand-600)"
+                                            x-bind:class="active === {{ $i }} ? 'border-(--color-brand-600)' : 'border-transparent opacity-70 hover:opacity-100'">
+                                            <img src="{{ asset('storage/' . $img) }}"
+                                                alt="Thumbnail {{ $i + 1 }}"
+                                                class="w-full h-full object-cover" loading="lazy">
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="p-6 sm:p-8">
                         <span class="text-xs font-semibold uppercase tracking-wider text-(--color-brand-600)">

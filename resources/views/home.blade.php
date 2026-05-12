@@ -92,15 +92,38 @@
                         class="group bg-(--color-surface) rounded-xl border border-(--color-border) overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition duration-200">
 
                         {{-- Thumbnail --}}
+                        @php
+                            $thumb = collect($course->images ?? [])->filter()->first();
+                            $imageCount = collect($course->images ?? [])->filter()->count();
+                        @endphp
                         <div class="relative aspect-[16/10] bg-(--color-surface-2) overflow-hidden">
-                            <div aria-hidden="true"
-                                class="absolute inset-0 bg-gradient-to-br from-(--color-brand-100) to-(--color-accent-100)">
-                            </div>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="font-display text-5xl text-(--color-brand-700)/40">
-                                    {{ strtoupper(mb_substr($course->title, 0, 1)) }}
-                                </span>
-                            </div>
+                            @if ($thumb)
+                                <img src="{{ asset('storage/' . $thumb) }}"
+                                    alt="Gambar kursus {{ $course->title }}"
+                                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                                    loading="lazy">
+                                @if ($imageCount > 1)
+                                    <span
+                                        class="absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-black/60 text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                            fill="currentColor" class="w-3.5 h-3.5" aria-hidden="true">
+                                            <path fill-rule="evenodd"
+                                                d="M1 5.25A2.25 2.25 0 0 1 3.25 3h13.5A2.25 2.25 0 0 1 19 5.25v9.5A2.25 2.25 0 0 1 16.75 17H3.25A2.25 2.25 0 0 1 1 14.75v-9.5Zm1.5 5.81v3.69c0 .414.336.75.75.75h13.5a.75.75 0 0 0 .75-.75v-2.69l-2.22-2.219a.75.75 0 0 0-1.06 0l-1.91 1.909.47.47a.75.75 0 1 1-1.06 1.06L6.53 8.091a.75.75 0 0 0-1.06 0L2.5 11.06ZM12 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        {{ $imageCount }}
+                                    </span>
+                                @endif
+                            @else
+                                <div aria-hidden="true"
+                                    class="absolute inset-0 bg-gradient-to-br from-(--color-brand-100) to-(--color-accent-100)">
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="font-display text-5xl text-(--color-brand-700)/40">
+                                        {{ strtoupper(mb_substr($course->title, 0, 1)) }}
+                                    </span>
+                                </div>
+                            @endif
                             @if ($loop->first)
                                 <span
                                     class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-(--color-accent-500) text-(--color-text)">

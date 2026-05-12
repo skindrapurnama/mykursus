@@ -12,12 +12,20 @@ class Course extends Model
     protected $fillable = [
         'title',
         'description',
+        'images',
         'price',
         'quota',
         'start_date',
         'end_date',
         'certificate_template',
         'is_comment_enabled'
+    ];
+
+    protected $casts = [
+        'images' => 'array',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'is_comment_enabled' => 'boolean',
     ];
 
     public function registrations()

@@ -56,6 +56,28 @@ class CourseResource extends Resource
                     ->columns(1)
                     ->columnSpanFull(),
 
+                Forms\Components\Section::make('Gambar kursus')
+                    ->description('Unggah satu atau lebih gambar/banner kursus. Gambar pertama akan dipakai sebagai thumbnail di katalog.')
+                    ->schema([
+                        Forms\Components\FileUpload::make('images')
+                            ->label('Gambar / banner')
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->image()
+                            ->imageEditor()
+                            ->disk('public')
+                            ->directory('course-images')
+                            ->visibility('public')
+                            ->maxFiles(10)
+                            ->maxSize(4096)
+                            ->panelLayout('grid')
+                            ->helperText('Format JPG/PNG/WEBP, maks 4 MB per gambar. Maksimal 10 gambar. Seret untuk mengatur urutan.')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1)
+                    ->columnSpanFull(),
+
                 Forms\Components\Section::make('Harga & kuota')
                     ->schema([
                         Forms\Components\TextInput::make('price')
@@ -124,11 +146,21 @@ class CourseResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                ImageColumn::make('images')
+                    ->label('Gambar')
+                    ->disk('public')
+                    ->square()
+                    ->size(48)
+                    ->stacked()
+                    ->limit(3)
+                    ->limitedRemainingText(),
+
                 ImageColumn::make('certificate_template')
                     ->label('Template')
                     ->disk('public')
                     ->square()
-                    ->size(48),
+                    ->size(48)
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('title')
                     ->label('Judul')

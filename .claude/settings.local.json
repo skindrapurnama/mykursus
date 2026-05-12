@@ -13,7 +13,8 @@
       "PowerShell(gh *)",
       "PowerShell(Test-Path *)",
       "PowerShell(Remove-Item *)",
-      "PowerShell(php -i 2>&1 | findstr /R \"curl.cainfo openssl.cafile php.ini Loaded\")"
+      "PowerShell(php -i 2>&1 | findstr /R \"curl.cainfo openssl.cafile php.ini Loaded\")",
+      "Bash(php artisan *)"
     ]
   }
 }

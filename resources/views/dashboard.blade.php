@@ -114,6 +114,108 @@
             </article>
         </div>
 
+        {{-- ============== LANJUTKAN BELAJAR ============== --}}
+        <section class="mt-12">
+            <div class="flex items-end justify-between gap-3 mb-4">
+                <h2 class="font-display text-2xl tracking-tight text-(--color-text)">Lanjutkan belajar</h2>
+                <a href="{{ url('/my-courses') }}"
+                    class="text-sm font-medium text-(--color-brand-600) hover:text-(--color-brand-700) shrink-0">
+                    Lihat semua →
+                </a>
+            </div>
+
+            @if ($continueLearning->isEmpty())
+                <div class="rounded-xl border border-dashed border-(--color-border-strong) bg-(--color-surface) p-8 text-center">
+                    <p class="text-(--color-text-muted)">Belum ada kursus aktif untuk dilanjutkan.</p>
+                    <a href="/#kursus"
+                        class="mt-3 inline-flex items-center justify-center h-10 px-4 rounded-lg bg-(--color-brand-600) text-(--color-text-on-brand) text-sm font-semibold hover:bg-(--color-brand-700) transition">
+                        Jelajahi kursus
+                    </a>
+                </div>
+            @else
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach ($continueLearning as $reg)
+                        <a href="{{ route('courses.show', $reg->course_id) }}"
+                            class="block p-5 rounded-xl bg-(--color-surface) border border-(--color-border) hover:border-(--color-brand-500) hover:shadow-md transition">
+                            <span class="text-xs uppercase tracking-wider font-semibold text-(--color-brand-600)">Kursus aktif</span>
+                            <h3 class="mt-2 font-semibold text-(--color-text) line-clamp-2 leading-snug">
+                                {{ $reg->course->title }}
+                            </h3>
+                            <p class="mt-3 text-xs text-(--color-text-subtle)">
+                                Terdaftar {{ $reg->created_at->diffForHumans() }}
+                            </p>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+
+        {{-- ============== AKTIVITAS TERBARU ============== --}}
+        <section class="mt-12">
+            <h2 class="font-display text-2xl tracking-tight text-(--color-text) mb-4">Aktivitas terbaru</h2>
+
+            @if ($activities->isEmpty())
+                <div class="rounded-xl border border-dashed border-(--color-border-strong) bg-(--color-surface) p-6 text-center">
+                    <p class="text-(--color-text-muted) text-sm">Belum ada aktivitas.</p>
+                </div>
+            @else
+                <ul role="list" class="space-y-2">
+                    @foreach ($activities as $a)
+                        <li class="flex items-start gap-3 p-4 rounded-xl bg-(--color-surface) border border-(--color-border)">
+                            <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0
+                                @switch($a['icon'])
+                                    @case('book') bg-(--color-brand-50) text-(--color-brand-700) @break
+                                    @case('check-badge') bg-(--color-success-soft) text-(--color-success) @break
+                                    @case('star') bg-(--color-accent-100) text-(--color-accent-600) @break
+                                    @default bg-(--color-surface-2) text-(--color-text-muted)
+                                @endswitch">
+                                @switch($a['icon'])
+                                    @case('book')
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5"
+                                            aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                                        </svg>
+                                    @break
+
+                                    @case('check-badge')
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5"
+                                            aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                                        </svg>
+                                    @break
+
+                                    @case('star')
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                            fill="currentColor" class="w-5 h-5" aria-hidden="true">
+                                            <path fill-rule="evenodd"
+                                                d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.007Z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    @break
+                                @endswitch
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-(--color-text)">{{ $a['title'] }}</p>
+                                <p class="text-xs text-(--color-text-subtle) mt-0.5">
+                                    {{ $a['timestamp']->diffForHumans() }}
+                                </p>
+                            </div>
+                            @if ($a['url'])
+                                <a href="{{ $a['url'] }}"
+                                    class="text-sm font-medium text-(--color-brand-600) hover:text-(--color-brand-700) shrink-0">
+                                    Buka
+                                </a>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+
         {{-- Quick links --}}
         <h2 class="mt-12 mb-4 font-display text-2xl tracking-tight text-(--color-text)">
             Akses cepat

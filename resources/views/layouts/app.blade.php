@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="id" x-data="{
     dark: (localStorage.getItem('theme') ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark'
-}" x-init="$watch('dark', v => { localStorage.setItem('theme', v ? 'dark' : 'light'); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)"
-    :class="{ 'dark': dark }">
+}" x-init="$watch('dark', v => { localStorage.setItem('theme', v ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark', v) });
+document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
 
 <head>
     <meta charset="UTF-8">
@@ -12,12 +13,10 @@
     <title>@yield('title', 'KursusApp — Belajar dari mentor profesional')</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link
-        href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700|instrument-serif:400&display=swap"
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700|instrument-serif:400&display=swap"
         rel="stylesheet">
 
-    @vite('resources/css/app.css')
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="min-h-dvh flex flex-col antialiased">
@@ -137,10 +136,12 @@
                     :aria-expanded="open" aria-label="Buka menu navigasi">
                     <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
                     </svg>
-                    <svg x-show="open" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
+                    <svg x-show="open" x-cloak xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"
+                        aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -151,7 +152,8 @@
         <div x-show="open" x-cloak x-transition.opacity.duration.150ms
             class="md:hidden border-t border-(--color-border) bg-(--color-surface)">
             <nav class="px-4 py-3 space-y-1" aria-label="Navigasi mobile">
-                <a href="/" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-(--color-text) hover:bg-(--color-surface-2)">Home</a>
+                <a href="/"
+                    class="block px-3 py-2.5 rounded-lg text-sm font-medium text-(--color-text) hover:bg-(--color-surface-2)">Home</a>
                 <a href="/#kursus"
                     class="block px-3 py-2.5 rounded-lg text-sm font-medium text-(--color-text) hover:bg-(--color-surface-2)">Kursus</a>
                 @auth
@@ -232,17 +234,24 @@
             <div>
                 <h6 class="text-xs font-semibold uppercase tracking-wider text-(--color-text-subtle) mb-3">Produk</h6>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="/#kursus" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kursus</a></li>
-                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kategori</a></li>
-                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Mentor</a></li>
+                    <li><a href="/#kursus" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kursus</a>
+                    </li>
+                    <li><a href="/"
+                            class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kategori</a></li>
+                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Mentor</a>
+                    </li>
                 </ul>
             </div>
             <div>
-                <h6 class="text-xs font-semibold uppercase tracking-wider text-(--color-text-subtle) mb-3">Perusahaan</h6>
+                <h6 class="text-xs font-semibold uppercase tracking-wider text-(--color-text-subtle) mb-3">Perusahaan
+                </h6>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Tentang</a></li>
-                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kontak</a></li>
-                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kebijakan</a></li>
+                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Tentang</a>
+                    </li>
+                    <li><a href="/" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kontak</a>
+                    </li>
+                    <li><a href="/"
+                            class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kebijakan</a></li>
                 </ul>
             </div>
         </div>

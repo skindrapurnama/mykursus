@@ -35,6 +35,12 @@ Route::post('/simulate-payment/{payment}', function ($id) {
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    Route::get('/certificates', [\App\Http\Controllers\CertificateController::class, 'index'])
+        ->name('certificates.index');
+
     Route::post('/courses/{course}/register', [CourseController::class, 'register'])
         ->name('courses.register');
 

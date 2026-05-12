@@ -8,7 +8,12 @@
       "Bash(npm install *)",
       "Bash(mkdir -p /c/Users/LenvPC/.claude/skills)",
       "Bash(cp -r /tmp/uiuxpromax/ui-ux-pro-max-skill/.claude/skills/* /c/Users/LenvPC/.claude/skills/)",
-      "PowerShell(py *)"
+      "PowerShell(py *)",
+      "PowerShell(npm install *)",
+      "PowerShell(gh *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(php -i 2>&1 | findstr /R \"curl.cainfo openssl.cafile php.ini Loaded\")"
     ]
   }
 }

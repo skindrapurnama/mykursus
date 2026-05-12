@@ -20,7 +20,9 @@ class Payment extends Model
         'order_id',
     ];
 
-    protected $dates = ['paid_at'];
+    protected $casts = [
+        'paid_at' => 'datetime',
+    ];
 
     public function registration()
     {

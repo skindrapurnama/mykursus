@@ -14,10 +14,12 @@ class Certificate extends Model
         'course_id',
         'certificate_number',
         'file_path',
-        'issued_at'
+        'issued_at',
     ];
 
-    protected $dates = ['issued_at'];
+    protected $casts = [
+        'issued_at' => 'datetime',
+    ];
 
     public function user()
     {

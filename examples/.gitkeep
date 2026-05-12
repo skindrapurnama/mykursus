@@ -1,0 +1,11 @@
+# examples/
+
+Place reference code patterns here that the AI should imitate when generating PRPs and implementing features.
+
+Suggested structure:
+- examples/controller-pattern.php      — preferred controller shape (thin, eager-loaded)
+- examples/feature-test.php             — preferred test shape (Feature test with RefreshDatabase)
+- examples/blade-card.blade.php         — canonical Blade component using design tokens
+- examples/migration-pattern.php        — preferred migration shape
+
+The richer this folder, the better the PRP output.

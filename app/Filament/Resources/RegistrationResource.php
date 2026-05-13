@@ -11,6 +11,9 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RegistrationResource extends Resource
 {
@@ -181,6 +184,13 @@ class RegistrationResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('exportCsv')
+                        ->label('Ekspor CSV terpilih')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (Collection $records): StreamedResponse => static::streamCsv($records)),
+
                     Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih'),
                 ]),
             ])
@@ -202,5 +212,79 @@ class RegistrationResource extends Resource
             'create' => Pages\CreateRegistration::route('/create'),
             'edit' => Pages\EditRegistration::route('/{record}/edit'),
         ];
+    }
+
+    public static function exportQuery(Builder $query): StreamedResponse
+    {
+        $records = $query->with(['user', 'course', 'payment'])->get();
+
+        return static::streamCsv($records);
+    }
+
+    public static function streamCsv(Collection $records): StreamedResponse
+    {
+        $records->loadMissing(['user', 'course', 'payment']);
+
+        $filename = 'pendaftaran-'.now()->format('Ymd-His').'.csv';
+
+        $headers = [
+            'ID',
+            'Tanggal Daftar',
+            'Nama Siswa',
+            'Email Siswa',
+            'Kursus',
+            'Harga Kursus (Rp)',
+            'Status Pendaftaran',
+            'Status Pembayaran',
+            'Metode Pembayaran',
+            'Nominal Bayar (Rp)',
+            'Tanggal Bayar',
+            'Order ID',
+        ];
+
+        $statusLabels = [
+            'pending' => 'Tertunda',
+            'approved' => 'Disetujui',
+            'rejected' => 'Ditolak',
+        ];
+
+        $paymentLabels = [
+            'pending' => 'Tertunda',
+            'paid' => 'Terbayar',
+            'approved' => 'Terbayar (Midtrans)',
+            'rejected' => 'Ditolak',
+            'failed' => 'Gagal',
+        ];
+
+        return new StreamedResponse(function () use ($records, $headers, $statusLabels, $paymentLabels) {
+            $handle = fopen('php://output', 'w');
+
+            // BOM for Excel UTF-8 compatibility
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, $headers);
+
+            foreach ($records as $record) {
+                fputcsv($handle, [
+                    $record->id,
+                    $record->created_at?->translatedFormat('d M Y H:i'),
+                    $record->user?->name,
+                    $record->user?->email,
+                    $record->course?->title,
+                    $record->course?->price !== null ? number_format((float) $record->course->price, 0, ',', '.') : '',
+                    $statusLabels[$record->status] ?? $record->status,
+                    $paymentLabels[$record->payment?->status] ?? ($record->payment?->status ?? 'Belum bayar'),
+                    $record->payment?->payment_method ?? '',
+                    $record->payment?->amount !== null ? number_format((float) $record->payment->amount, 0, ',', '.') : '',
+                    $record->payment?->paid_at?->translatedFormat('d M Y H:i') ?? '',
+                    $record->payment?->order_id ?? '',
+                ]);
+            }
+
+            fclose($handle);
+        }, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 }

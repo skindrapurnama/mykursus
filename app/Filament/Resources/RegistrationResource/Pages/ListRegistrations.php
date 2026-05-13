@@ -5,6 +5,7 @@ namespace App\Filament\Resources\RegistrationResource\Pages;
 use App\Filament\Resources\RegistrationResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ListRegistrations extends ListRecords
 {
@@ -13,7 +14,15 @@ class ListRegistrations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\Action::make('exportAll')
+                ->label('Ekspor CSV')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
+                ->action(fn (): StreamedResponse => RegistrationResource::exportQuery(
+                    $this->getFilteredTableQuery()
+                )),
+
+            Actions\CreateAction::make()->label('Tambah pendaftaran'),
         ];
     }
 }

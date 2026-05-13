@@ -4,14 +4,28 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_INSTRUCTOR = 'instructor';
+
+    public const ROLE_STUDENT = 'student';
+
+    public const ROLES = [
+        self::ROLE_ADMIN => 'Admin',
+        self::ROLE_INSTRUCTOR => 'Instruktur',
+        self::ROLE_STUDENT => 'Siswa',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +36,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -47,10 +62,31 @@ class User extends Authenticatable
         ];
     }
 
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isInstructor(): bool
+    {
+        return $this->role === self::ROLE_INSTRUCTOR;
+    }
+
+    public function isStudent(): bool
+    {
+        return $this->role === self::ROLE_STUDENT;
+    }
+
     public function certificates()
     {
         return $this->hasMany(Certificate::class);
     }
+
     public function registrations()
     {
         return $this->hasMany(\App\Models\Registration::class);

@@ -13,6 +13,9 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('/courses', [CourseController::class, 'index'])
+    ->name('courses.index');
+
 Route::get('/courses/{course}', [CourseController::class, 'show'])
     ->name('courses.show');
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');

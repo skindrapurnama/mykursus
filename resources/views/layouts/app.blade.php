@@ -43,8 +43,8 @@ document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark 
                     class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-(--color-surface-2) {{ $r === '/' ? 'text-(--color-brand-600)' : 'text-(--color-text)' }}">
                     Home
                 </a>
-                <a href="/#kursus"
-                    class="px-3 py-2 rounded-lg text-sm font-medium text-(--color-text) hover:bg-(--color-surface-2)">
+                <a href="{{ route('courses.index') }}"
+                    class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-(--color-surface-2) {{ str_starts_with($r, 'courses') ? 'text-(--color-brand-600)' : 'text-(--color-text)' }}">
                     Kursus
                 </a>
                 @auth
@@ -154,7 +154,7 @@ document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark 
             <nav class="px-4 py-3 space-y-1" aria-label="Navigasi mobile">
                 <a href="/"
                     class="block px-3 py-2.5 rounded-lg text-sm font-medium text-(--color-text) hover:bg-(--color-surface-2)">Home</a>
-                <a href="/#kursus"
+                <a href="{{ route('courses.index') }}"
                     class="block px-3 py-2.5 rounded-lg text-sm font-medium text-(--color-text) hover:bg-(--color-surface-2)">Kursus</a>
                 @auth
                     <a href="{{ url('/dashboard') }}"
@@ -234,7 +234,7 @@ document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark 
             <div>
                 <h6 class="text-xs font-semibold uppercase tracking-wider text-(--color-text-subtle) mb-3">Produk</h6>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="/#kursus" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kursus</a>
+                    <li><a href="{{ route('courses.index') }}" class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kursus</a>
                     </li>
                     <li><a href="/"
                             class="text-(--color-text-muted) hover:text-(--color-brand-600)">Kategori</a></li>

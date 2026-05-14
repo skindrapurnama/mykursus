@@ -31,7 +31,7 @@
                     untuk setiap kursus yang Anda selesaikan.
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="#kursus"
+                    <a href="{{ route('courses.index') }}"
                         class="inline-flex items-center justify-center h-12 px-6 rounded-lg bg-(--color-brand-600) text-(--color-text-on-brand) text-sm font-semibold shadow-sm hover:bg-(--color-brand-700) transition">
                         Mulai jelajah kursus
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
@@ -83,6 +83,16 @@
                         Temukan kursus yang tepat untuk mendukung perjalanan karier Anda.
                     </p>
                 </div>
+                <a href="{{ route('courses.index') }}"
+                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-(--color-brand-600) hover:text-(--color-brand-700) transition">
+                    Lihat semua kursus
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                        class="w-4 h-4" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

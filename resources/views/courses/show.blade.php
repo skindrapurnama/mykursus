@@ -175,6 +175,89 @@
                     </div>
                 </article>
 
+                {{-- Mentor kursus --}}
+                @php
+                    $mentors = $course->mentors()
+                        ->with('user')
+                        ->where('is_active', true)
+                        ->orderByRaw("CASE WHEN course_mentor.role = 'primary' THEN 0 ELSE 1 END")
+                        ->get();
+                @endphp
+                @if ($mentors->isNotEmpty())
+                    <article class="bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm p-6 sm:p-8">
+                        <h2 class="font-display text-2xl tracking-tight text-(--color-text)">Mentor kursus</h2>
+                        <p class="mt-1 text-sm text-(--color-text-muted)">Diajar langsung oleh praktisi berpengalaman.</p>
+
+                        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                            @foreach ($mentors as $mentor)
+                                <div class="flex gap-4 p-4 rounded-xl border border-(--color-border) bg-(--color-surface-2)">
+                                    {{-- Foto / inisial --}}
+                                    <div class="shrink-0">
+                                        @if ($mentor->photo)
+                                            <img src="{{ asset('storage/' . $mentor->photo) }}"
+                                                alt="Foto {{ $mentor->user?->name }}"
+                                                class="w-16 h-16 rounded-full object-cover border-2 border-(--color-surface)"
+                                                loading="lazy">
+                                        @else
+                                            <div class="w-16 h-16 rounded-full flex items-center justify-center bg-(--color-brand-100) text-(--color-brand-700) font-display text-2xl">
+                                                {{ strtoupper(mb_substr($mentor->user?->name ?? '?', 0, 1)) }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <h3 class="font-semibold text-(--color-text) truncate">
+                                                {{ $mentor->user?->name }}
+                                            </h3>
+                                            @if (($mentor->pivot->role ?? null) === 'primary')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-(--color-success-soft) text-(--color-success)">
+                                                    Mentor utama
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-(--color-surface-3) text-(--color-text-muted)">
+                                                    Co-mentor
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        @if ($mentor->years_experience)
+                                            <p class="mt-0.5 text-xs text-(--color-text-subtle)">
+                                                {{ $mentor->years_experience }} tahun pengalaman
+                                            </p>
+                                        @endif
+
+                                        <p class="mt-2 text-sm text-(--color-text-muted) line-clamp-3">
+                                            {{ $mentor->bio }}
+                                        </p>
+
+                                        @if (!empty($mentor->expertise))
+                                            <div class="mt-2.5 flex flex-wrap gap-1.5">
+                                                @foreach (array_slice($mentor->expertise, 0, 5) as $tag)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-(--color-brand-50) text-(--color-brand-700)">
+                                                        {{ $tag }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+
+                                        @if ($mentor->linkedin_url)
+                                            <a href="{{ str_starts_with($mentor->linkedin_url, 'http') ? $mentor->linkedin_url : 'https://' . $mentor->linkedin_url }}"
+                                                target="_blank" rel="noopener noreferrer"
+                                                class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-(--color-brand-600) hover:text-(--color-brand-700)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5" aria-hidden="true">
+                                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.063 2.063 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                                </svg>
+                                                LinkedIn
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </article>
+                @endif
+
                 {{-- Apa yang akan dipelajari --}}
                 <article class="bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm p-6 sm:p-8">
                     <h2 class="font-display text-2xl tracking-tight text-(--color-text)">Yang akan Anda pelajari</h2>

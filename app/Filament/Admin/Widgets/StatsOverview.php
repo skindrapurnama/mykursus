@@ -17,6 +17,11 @@ class StatsOverview extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     protected function getStats(): array
     {
         $now = Carbon::now();

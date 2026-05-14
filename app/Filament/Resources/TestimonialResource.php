@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RestrictsToMentorCourses;
 use App\Filament\Resources\TestimonialResource\Pages;
 use App\Models\Testimonial;
 use Filament\Forms;
@@ -13,9 +14,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class TestimonialResource extends Resource
 {
+    use RestrictsToMentorCourses;
+
     protected static ?string $model = Testimonial::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
@@ -205,9 +209,10 @@ class TestimonialResource extends Resource
                     ->icon(fn (Testimonial $record): string => $record->is_visible ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Testimonial $record): string => $record->is_visible ? 'gray' : 'success')
                     ->requiresConfirmation()
+                    ->visible(fn (): bool => static::isAdminUser())
                     ->action(fn (Testimonial $record) => $record->update(['is_visible' => ! $record->is_visible])),
 
-                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\EditAction::make()->label('Edit')->visible(fn (): bool => static::isAdminUser()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -216,6 +221,7 @@ class TestimonialResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->requiresConfirmation()
+                        ->visible(fn (): bool => static::isAdminUser())
                         ->action(fn ($records) => $records->each->update(['is_visible' => true])),
 
                     Tables\Actions\BulkAction::make('hide')
@@ -223,9 +229,10 @@ class TestimonialResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->requiresConfirmation()
+                        ->visible(fn (): bool => static::isAdminUser())
                         ->action(fn ($records) => $records->each->update(['is_visible' => false])),
 
-                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih'),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih')->visible(fn (): bool => static::isAdminUser()),
                 ]),
             ])
             ->emptyStateHeading('Belum ada testimoni')
@@ -246,5 +253,10 @@ class TestimonialResource extends Resource
             'create' => Pages\CreateTestimonial::route('/create'),
             'edit' => Pages\EditTestimonial::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return static::scopeToMentorCourses(parent::getEloquentQuery());
     }
 }

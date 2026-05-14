@@ -41,6 +41,8 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 \App\Filament\Admin\Widgets\StatsOverview::class,
+                \App\Filament\Admin\Widgets\MentorMyCoursesWidget::class,
+                \App\Filament\Admin\Widgets\MentorRecentEnrollmentsWidget::class,
                 \App\Filament\Admin\Widgets\RegistrationsChart::class,
                 \App\Filament\Admin\Widgets\RevenueChart::class,
                 \App\Filament\Admin\Widgets\TopCoursesTable::class,

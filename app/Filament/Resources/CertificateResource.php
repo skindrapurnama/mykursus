@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RestrictsToMentorCourses;
 use App\Filament\Resources\CertificateResource\Pages;
 use App\Models\Certificate;
 use Filament\Forms;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Storage;
 
 class CertificateResource extends Resource
 {
+    use RestrictsToMentorCourses;
+
     protected static ?string $model = Certificate::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -198,11 +201,11 @@ class CertificateResource extends Resource
                         : null)
                     ->openUrlInNewTab(),
 
-                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\EditAction::make()->label('Edit')->visible(fn (): bool => static::isAdminUser()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih'),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih')->visible(fn (): bool => static::isAdminUser()),
                 ]),
             ])
             ->emptyStateHeading('Belum ada sertifikat')
@@ -223,5 +226,10 @@ class CertificateResource extends Resource
             'create' => Pages\CreateCertificate::route('/create'),
             'edit' => Pages\EditCertificate::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return static::scopeToMentorCourses(parent::getEloquentQuery());
     }
 }

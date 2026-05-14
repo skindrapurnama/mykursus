@@ -42,4 +42,11 @@ class Course extends Model
     {
         return $this->hasMany(Certificate::class);
     }
+
+    public function mentors()
+    {
+        return $this->belongsToMany(Mentor::class)
+            ->withPivot('role')
+            ->withTimestamps();
+    }
 }

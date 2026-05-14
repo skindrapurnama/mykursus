@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RestrictsToMentorCourses;
 use App\Filament\Resources\CourseResource\Pages;
 use App\Models\Course;
 use Filament\Forms;
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CourseResource extends Resource
 {
+    use RestrictsToMentorCourses;
+
     protected static ?string $model = Course::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -262,7 +265,7 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            CourseResource\RelationManagers\MentorsRelationManager::class,
         ];
     }
 
@@ -273,5 +276,18 @@ class CourseResource extends Resource
             'create' => Pages\CreateCourse::route('/create'),
             'edit' => Pages\EditCourse::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (static::isMentorUser()) {
+            $query->whereHas('mentors', function (Builder $q): void {
+                $q->where('mentors.user_id', auth()->id());
+            });
+        }
+
+        return $query;
     }
 }

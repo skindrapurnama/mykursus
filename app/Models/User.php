@@ -64,7 +64,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isAdmin();
+        return $this->isAdmin() || $this->isInstructor();
     }
 
     public function isAdmin(): bool
@@ -90,5 +90,10 @@ class User extends Authenticatable implements FilamentUser
     public function registrations()
     {
         return $this->hasMany(\App\Models\Registration::class);
+    }
+
+    public function mentor()
+    {
+        return $this->hasOne(Mentor::class);
     }
 }

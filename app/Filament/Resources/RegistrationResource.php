@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RestrictsToMentorCourses;
 use App\Filament\Resources\RegistrationResource\Pages;
 use App\Models\Registration;
 use Filament\Forms;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RegistrationResource extends Resource
 {
+    use RestrictsToMentorCourses;
+
     protected static ?string $model = Registration::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
@@ -168,7 +171,7 @@ class RegistrationResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalHeading('Setujui pendaftaran?')
-                    ->visible(fn (Registration $record): bool => $record->status === 'pending')
+                    ->visible(fn (Registration $record): bool => static::isAdminUser() && $record->status === 'pending')
                     ->action(fn (Registration $record) => $record->update(['status' => 'approved'])),
 
                 Tables\Actions\Action::make('reject')
@@ -177,10 +180,10 @@ class RegistrationResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalHeading('Tolak pendaftaran?')
-                    ->visible(fn (Registration $record): bool => $record->status !== 'rejected')
+                    ->visible(fn (Registration $record): bool => static::isAdminUser() && $record->status !== 'rejected')
                     ->action(fn (Registration $record) => $record->update(['status' => 'rejected'])),
 
-                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\EditAction::make()->label('Edit')->visible(fn (): bool => static::isAdminUser()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -191,7 +194,7 @@ class RegistrationResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->action(fn (Collection $records): StreamedResponse => static::streamCsv($records)),
 
-                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih'),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih')->visible(fn (): bool => static::isAdminUser()),
                 ]),
             ])
             ->emptyStateHeading('Belum ada pendaftaran')
@@ -212,6 +215,11 @@ class RegistrationResource extends Resource
             'create' => Pages\CreateRegistration::route('/create'),
             'edit' => Pages\EditRegistration::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return static::scopeToMentorCourses(parent::getEloquentQuery());
     }
 
     public static function exportQuery(Builder $query): StreamedResponse

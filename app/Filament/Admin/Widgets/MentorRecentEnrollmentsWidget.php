@@ -3,29 +3,34 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Registration;
-use Filament\Tables;
+use App\Models\User;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
-class RecentRegistrationsTable extends BaseWidget
+class MentorRecentEnrollmentsWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Pendaftaran terbaru';
+    protected static ?string $heading = 'Pendaftar terbaru di kursus saya';
 
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 2;
 
     protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
-        return auth()->user()?->isAdmin() ?? false;
+        $user = auth()->user();
+
+        return $user instanceof User && $user->isInstructor();
     }
 
     protected function getTableQuery(): Builder
     {
         return Registration::query()
             ->with(['user', 'course', 'payment'])
+            ->whereHas('course.mentors', function (Builder $q): void {
+                $q->where('mentors.user_id', auth()->id());
+            })
             ->latest('created_at');
     }
 
@@ -90,26 +95,9 @@ class RecentRegistrationsTable extends BaseWidget
         return $table
             ->query($this->getTableQuery())
             ->columns($this->getTableColumns())
-            ->actions([
-                Tables\Actions\Action::make('approve')
-                    ->label('Setujui')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->visible(fn (Registration $record): bool => $record->status === 'pending')
-                    ->action(fn (Registration $record) => $record->update(['status' => 'approved'])),
-
-                Tables\Actions\Action::make('reject')
-                    ->label('Tolak')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->visible(fn (Registration $record): bool => $record->status === 'pending')
-                    ->action(fn (Registration $record) => $record->update(['status' => 'rejected'])),
-            ])
             ->defaultPaginationPageOption(10)
             ->paginated([10, 25])
-            ->emptyStateHeading('Belum ada pendaftaran')
-            ->emptyStateDescription('Pendaftaran baru akan tampil di sini.');
+            ->emptyStateHeading('Belum ada pendaftar')
+            ->emptyStateDescription('Pendaftaran baru di kursus Anda akan tampil di sini.');
     }
 }

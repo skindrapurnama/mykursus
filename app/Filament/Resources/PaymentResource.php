@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RestrictsToMentorCourses;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Models\Payment;
 use App\Models\Registration;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Storage;
 
 class PaymentResource extends Resource
 {
+    use RestrictsToMentorCourses;
+
     protected static ?string $model = Payment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
@@ -254,7 +257,7 @@ class PaymentResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Setujui pembayaran?')
                     ->modalDescription('Pendaftaran terkait akan otomatis disetujui melalui PaymentObserver.')
-                    ->visible(fn ($record): bool => $record->status === 'pending')
+                    ->visible(fn ($record): bool => static::isAdminUser() && $record->status === 'pending')
                     ->action(function ($record): void {
                         $record->update([
                             'status' => 'paid',
@@ -269,18 +272,18 @@ class PaymentResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Tolak pembayaran?')
                     ->modalDescription('Pendaftaran terkait akan ditandai rejected.')
-                    ->visible(fn ($record): bool => in_array($record->status, ['paid', 'approved', 'pending'], true))
+                    ->visible(fn ($record): bool => static::isAdminUser() && in_array($record->status, ['paid', 'approved', 'pending'], true))
                     ->action(function ($record): void {
                         $record->update(['status' => 'rejected']);
                         Registration::where('id', $record->registration_id)
                             ->update(['status' => 'rejected']);
                     }),
 
-                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\EditAction::make()->label('Edit')->visible(fn (): bool => static::isAdminUser()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih'),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus terpilih')->visible(fn (): bool => static::isAdminUser()),
                 ]),
             ])
             ->emptyStateHeading('Belum ada pembayaran')
@@ -301,5 +304,18 @@ class PaymentResource extends Resource
             'create' => Pages\CreatePayment::route('/create'),
             'edit' => Pages\EditPayment::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (static::isMentorUser()) {
+            $query->whereHas('registration.course.mentors', function (Builder $q): void {
+                $q->where('mentors.user_id', auth()->id());
+            });
+        }
+
+        return $query;
     }
 }

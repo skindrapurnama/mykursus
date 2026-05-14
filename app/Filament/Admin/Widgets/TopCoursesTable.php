@@ -17,6 +17,11 @@ class TopCoursesTable extends BaseWidget
 
     protected int|string|array $columnSpan = ['md' => 2, 'xl' => 2];
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     protected function getTableQuery(): Builder
     {
         return Course::query()

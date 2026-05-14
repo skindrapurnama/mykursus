@@ -16,6 +16,11 @@ class RevenueChart extends ChartWidget
 
     protected int|string|array $columnSpan = ['md' => 2, 'xl' => 2];
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     protected function getData(): array
     {
         $start = Carbon::now()->subMonthsNoOverflow(11)->startOfMonth();
